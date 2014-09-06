@@ -1,0 +1,3 @@
+#!/bin/bash
+
+make -f /home/calkan/code/gentools/Makefile

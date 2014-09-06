@@ -1,0 +1,2 @@
+awk '{print $1"\t"$2-20000"\t"$3+20000"\t"$1"_"$2"_"$3".pdf\tfull-rmsk\tdense-genomicSuperDups\tfull-artifact_may13v2\tfull-abc8_may13\tfull-ABC8_MF_DOC_GCnorm122696458612820827157\tfull-ABC8WSSD\tfull-JDW_MF_DOC_GCnorm\tfull-JDWWSSD\tfull-CommonDuplications\tfull-VenterWSSDRepeatCleanedandChained122946442012820827157\tfull-gap\tfull-aCGH_JDW_ABC8apechip"}' 10kbapart.txt
+

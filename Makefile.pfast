@@ -1,0 +1,18 @@
+CODEDIR=.
+BINDIR=.
+CFLAGS=-g
+
+all: pfast runfast 
+
+pfast:	$(CODEDIR)/pfast.c
+	gcc $(CODEDIR)/pfast.c -o $(BINDIR)/pfast -g -lm -Wall -lpthread
+
+runfast: $(CODEDIR)/runfast.c
+	gcc $(CODEDIR)/runfast.c -o $(BINDIR)/runfast -g -Wall 
+
+opt:	$(CODEDIR)/pfast.c
+	gcc -O3 $(CODEDIR)/pfast.c -o $(BINDIR)/pfast -lm -Wall -lpthread
+
+clean:
+	rm -f *o *~ \#*
+

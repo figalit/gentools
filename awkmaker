@@ -1,0 +1,2 @@
+awk '{print "awk @{if ($1==\""$1"\" && $2=="$2" && $3=="$3") print }@ coordinates_to_intersect.txt.wgacALL"}' coordinates_to_intersect.txt | sed s/@/"'"/g
+

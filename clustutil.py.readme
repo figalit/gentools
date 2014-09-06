@@ -1,0 +1,1 @@
+I ran  python /net/gs/vol1/home/kitz/pycommon/clustutil.py -i do_splitup_fastqs.sh -g 5 --submit_tasks --queue all.q

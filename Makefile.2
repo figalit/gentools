@@ -1,0 +1,40 @@
+CODEDIR=/home/calkan/code/gentools
+BINDIR=/home/calkan/bin
+
+all: clustermonomers hormatcher horpattern fastafix fastadel fastatotab fastatabclean qualfetch plotcorrelatedarray revcomp qual-tandem-subseq tabtofasta qualitymask clip complement seqlen cleanfa
+clustermonomers:	/home/calkan/code/gentools/clustermonomers.c 
+	gcc /home/calkan/code/gentools/clustermonomers.c -o /home/calkan/bin/clustermonomers -g
+hormatcher:	/home/calkan/code/gentools/hormatcher.c
+	gcc /home/calkan/code/gentools/hormatcher.c -o /home/calkan/bin/hormatcher -g
+horpattern:	/home/calkan/code/gentools/horpattern.c
+	gcc /home/calkan/code/gentools/horpattern.c -o /home/calkan/bin/horpattern -g
+fastafix:	/home/calkan/code/gentools/fastafix.c
+	gcc /home/calkan/code/gentools/fastafix.c -o /home/calkan/bin/fastafix -g
+fastadel:	/home/calkan/code/gentools/fastadel.c
+	gcc /home/calkan/code/gentools/fastadel.c -o /home/calkan/bin/fastadel -g
+fastatotab:	/home/calkan/code/gentools/fastatotab.c
+	gcc /home/calkan/code/gentools/fastatotab.c -o /home/calkan/bin/fastatotab -g
+fastatabclean:	/home/calkan/code/gentools/fastatabclean.c
+	gcc /home/calkan/code/gentools/fastatabclean.c -o /home/calkan/bin/fastatabclean -g
+qualfetch:	/home/calkan/code/gentools/qualfetch.c
+	gcc /home/calkan/code/gentools/qualfetch.c -o /home/calkan/bin/qualfetch -g
+plotcorrelatedarray:	/home/calkan/code/gentools/plotcorrelatedarray.c
+	gcc /home/calkan/code/gentools/plotcorrelatedarray.c -o /home/calkan/bin/plotcorrelatedarray -g
+revcomp:	/home/calkan/code/gentools/revcomp.c
+	gcc /home/calkan/code/gentools/revcomp.c -o /home/calkan/bin/revcomp -g
+clip:	/home/calkan/code/gentools/clip.c
+	gcc /home/calkan/code/gentools/clip.c -o /home/calkan/bin/clip -g
+seqlen:	/home/calkan/code/gentools/seqlen.c
+	gcc /home/calkan/code/gentools/seqlen.c -o /home/calkan/bin/seqlen -g
+complement:	/home/calkan/code/gentools/complement.c
+	gcc /home/calkan/code/gentools/complement.c -o /home/calkan/bin/complement -g
+qual-tandem-subseq:	/home/calkan/code/gentools/qual-tandem-subseq.c
+	gcc /home/calkan/code/gentools/qual-tandem-subseq.c -o /home/calkan/bin/qual-tandem-subseq -g
+tabtofasta:	/home/calkan/code/gentools/tabtofasta.c
+	gcc /home/calkan/code/gentools/tabtofasta.c -o /home/calkan/bin/tabtofasta -g
+qualitymask: /home/calkan/code/gentools/qualitymask.c
+	gcc /home/calkan/code/gentools/qualitymask.c -o /home/calkan/bin/qualitymask -g
+cleanfa:	/home/calkan/code/gentools/cleanfa.c
+	gcc /home/calkan/code/gentools/cleanfa.c -o /home/calkan/bin/cleanfa -g	
+clean:
+	rm -f *o *~ \#*
