@@ -27,23 +27,28 @@ void align(char *S, char *T, int **V, int **P);
 int max3(int a, int b, int c);
 int max(int a, int b);
 void kimura(char *, char *, double *, double *);
-
+int **V, **F, **E, **G, **P; // tables
+void rcomp(char *, char *);
 
 double pairwise(char *S, char *T){
   int tSize, sSize; // textSize, sourceSize
   int Wg=16, Ws=4; // gap penalty , space penalty
-  int **V, **F, **E, **G, **P; // tables
+
   //int V[MAX+1][MAX+1], G[MAX+1][MAX+1], E[MAX+1][MAX+1], F[MAX+1][MAX+1];
   int i, j;
   double ret;
   tSize = strlen(T);
   sSize = strlen(S);
+  //printf("%d-%d\n",sSize, tSize);
+  if (sSize==358 && tSize==1065)
+    printf("eh\n");
   /* create vectors */
   V = (int **)malloc(sizeof(int *)*(sSize+1));
   F = (int **)malloc(sizeof(int *)*(sSize+1));
   E = (int **)malloc(sizeof(int *)*(sSize+1));
   G = (int **)malloc(sizeof(int *)*(sSize+1));
   P = (int **)malloc(sizeof(int *)*(sSize+1));
+
   for (i=0;i<=sSize;i++){
     V[i]=(int *)malloc(sizeof(int)*(tSize+1));    
     F[i]=(int *)malloc(sizeof(int)*(tSize+1));
@@ -145,12 +150,12 @@ void align2(char *S, char *T, int **V, int **P){
   int i,j,k; int c2=0;
   char *Sp, *Tp; // Sprime, Tprime
   char *Sp2, *Tp2; // Sprime, Tprime
-  Tp = (char *)malloc(tSize*2);
-  Sp = (char *)malloc(sSize*2);
+  Tp = (char *)malloc((tSize+sSize)*2);
+  Sp = (char *)malloc((tSize+sSize)*2);
   Tp[0]=0;
   Sp[0]=0;
-  Tp2 = (char *)malloc(tSize*2);
-  Sp2 = (char *)malloc(sSize*2);
+  Tp2 = (char *)malloc((tSize+sSize)*2);
+  Sp2 = (char *)malloc((tSize+sSize)*2);
   Tp2[0]=0;
   Sp2[0]=0;
   i = sSize; j = tSize;
@@ -318,8 +323,8 @@ void align(char *S, char *T, int **V, int **P){
   //  char *Sp2, *Tp2; // Sprime, Tprime
   int ii, jj;
   
-  Tp = (char *)malloc(tSize*2);
-  Sp = (char *)malloc(sSize*2);
+  Tp = (char *)malloc((tSize+sSize)*2); //(tSize*2);
+  Sp = (char *)malloc((tSize+sSize)*2); //(sSize*2);
   Tp[0]=0;
   Sp[0]=0;
   //Tp2 = (char *)malloc(tSize*2);
@@ -388,14 +393,22 @@ double hamming(char *S, char *T){
   int prev=0;
   double percentage;
   for (i=0;i<strlen(S);i++)
-    if (S[i] == T[i] && S[i]!='-')
+    if (S[i] == T[i])// && S[i]!='-')
       similar++;
-  length=similar;
 
+  
+  
+  //printf("SEQUENCES\n%s\n%s\n",S, T);
+
+  length=strlen(S);
+
+  /*
   for (i=0;i<strlen(S);i++)
     if (S[i] != T[i] && S[i]!='-' && T[i]!='-')
       length++;
+  */
 
+  /*
   for (i=0;i<strlen(S);i++){
     if (S[i] == '-'){
       if (!prev){
@@ -416,7 +429,7 @@ double hamming(char *S, char *T){
     }
     else
       prev=0;
-  }
+      }*/
   
   percentage = (1 - (double)similar/(double)length );
 
@@ -440,9 +453,10 @@ int readFasta(FILE *alnFile, FILE *horFile){
   int seqcnt=0, seqlen=0;
   int horseqcnt=0, horseqlen=0;
   char dummy[300];
+  int j;
 
   cnt = 0; i=0;
-  seqlen = 300; horseqlen = 300;
+  seqlen = 2000; horseqlen = 2000;
   
   rewind(alnFile);
   while (fscanf(alnFile, "%c", &ch) > 0){
@@ -536,8 +550,15 @@ int readFasta(FILE *alnFile, FILE *horFile){
       cnt++;
       fgets(names[cnt], SEQ_LENGTH, alnFile);
       names[cnt][strlen(names[cnt])-1] = 0;
+      for (j=0;j<strlen(names[cnt]);j++){
+	if (names[cnt][j]=='\t')
+	  names[cnt][j] = ' ';
+      }
       printf("seq-%d: %s\n", cnt, names[0]);
     }
+    else if (isspace(ch))
+      continue;
+
     i = 0;
     if (cnt != 0)
       seqs[cnt][i++] = ch;
@@ -552,6 +573,10 @@ int readFasta(FILE *alnFile, FILE *horFile){
       cnt++;
       if (cnt != seqcnt){
 	fgets(names[cnt], SEQ_LENGTH, alnFile);
+	for (j=0;j<strlen(names[cnt]);j++){
+	  if (names[cnt][j]=='\t')
+	    names[cnt][j] = ' ';
+	}
 	names[cnt][strlen(names[cnt])-1] = 0;
 	printf("seq-%d: %s\n", cnt, names[cnt]);
       }
@@ -576,8 +601,15 @@ int readFasta(FILE *alnFile, FILE *horFile){
       cnt++;
       fgets(hornames[cnt], SEQ_LENGTH, horFile);
       hornames[cnt][strlen(hornames[cnt])-1] = 0;
+      for (j=0;j<strlen(hornames[cnt]);j++){
+	if (hornames[cnt][j]=='\t')
+	  hornames[cnt][j] = ' ';
+      } 
+      hornames[cnt][strlen(hornames[cnt])-1] = 0;
       printf("hseq-%d: %s\n", cnt, hornames[0]);
     }
+    else if (isspace(ch))
+      continue;
     i = 0;
     if (cnt != 0)
       horseqs[cnt][i++] = ch;
@@ -593,6 +625,10 @@ int readFasta(FILE *alnFile, FILE *horFile){
       if (cnt != horseqcnt){
 	fgets(hornames[cnt], SEQ_LENGTH, horFile);
 	hornames[cnt][strlen(hornames[cnt])-1] = 0;
+	for (j=0;j<strlen(hornames[cnt]);j++){
+	  if (hornames[cnt][j]=='\t')
+	    hornames[cnt][j] = ' ';
+	}
 	printf("hseq-%d: %s\n", cnt, hornames[cnt]);
       }
     } // if
@@ -613,7 +649,7 @@ int main(int argc, char **argv){
   int noofsequences;
   int i,j,k;
   double distance;
-  double **distances;
+  //double **distances;
   double se_distance;
   //double **se_distances;
   
@@ -621,10 +657,13 @@ int main(int argc, char **argv){
   double totsedist = 0.0;
 
   FILE *outfasta;
+  
+
   char fname[100];
   int hor=0;
   double score;
-  
+  char *revseq;
+
   int totalalignments;
 
   if (argc != 3){
@@ -644,13 +683,18 @@ int main(int argc, char **argv){
   noofsequences = readFasta(fasta, horfile);
 
   for (i=0;i<2;i++)
-    aligned[i]=(char *)malloc(strlen(seqs[i]) * 3);
+    //aligned[i]=(char *)malloc(strlen(seqs[i]) * 3);
+    aligned[i]=(char *)malloc(2000 * 5);
+
+  revseq=(char *)malloc(2000 * 5);
 
   noofsequences=monocnt;
 
+  /*
   distances=(double **) malloc(sizeof(double *) * monocnt);
   for (i=0;i<monocnt;i++)
     distances[i]=(double *) malloc(sizeof(double) * horcnt);
+  */
 
   /*
 
@@ -663,22 +707,37 @@ int main(int argc, char **argv){
   outfasta = fopen(fname, "w");
 
 
+  /*
   for (i=0;i<monocnt;i++)
     for (j=0;j<horcnt;j++)
       distances[i][j]=0.0;
-
+  */
 
   totalalignments = monocnt*horcnt;
+
+  fprintf(outfasta, "\t\t");
+  for (j=0; j<horcnt; j++)
+    fprintf(outfasta, "%s\t", hornames[j]);
+  fprintf(outfasta, "\n");
  
   for (i=0; i<monocnt; i++){
+    fprintf(outfasta, "%s\t\t", names[i]);
     for (j=0; j<horcnt; j++){
-      score = pairwise(seqs[i], horseqs[j]);
-      printf("Sequences [%d, %d] Aligned: %f \n",i,j,score);
-      
-      //distance=hamming(aligned[0], aligned[1]);
-      kimura(aligned[0], aligned[1], &distance, &se_distance);
-      
-      printf("K2M [%d, %d] Computed: %f \n",i,j,distance);
+      if (i>j){
+	score = pairwise(seqs[i], horseqs[j]);
+	distance=hamming(aligned[0], aligned[1]);
+      }
+      else if (i<j){
+	rcomp(horseqs[j], revseq);
+	score = pairwise(seqs[i], revseq);
+	distance = hamming(aligned[0], aligned[1]);
+      }
+      else{
+	score = 0;
+	distance = 0;
+      }
+
+      //kimura(aligned[0], aligned[1], &distance, &se_distance);
 
       /*
       if (!(distance>=0.0 && distance<=1.0)){
@@ -695,15 +754,26 @@ int main(int argc, char **argv){
       else{
 	totalalignments--;
       }
-      
+
+      fprintf(outfasta, "%f\t", distance);
+
+      if (distance < 0.1 && i!=j)
+	printf("%s\t%s\t%f\n", names[i], names[j], distance);
+
+      /*
       fprintf(outfasta, "%s\t%s\n", names[i], hornames[j]);
       fprintf(outfasta, "%s\n", aligned[0]);
       fprintf(outfasta, "%s\n\n", aligned[1]);
       fflush(outfasta);
-      distances[i][j] = distance;
-      
+
+      */
+
+
+      //distances[i][j] = distance;
+     
 
     }
+    fprintf(outfasta, "\n");
   }
   
   
@@ -712,29 +782,24 @@ int main(int argc, char **argv){
   fprintf(stdout, "Average K2M: %f\n", (totdist/ (double)(totalalignments)));
   fprintf(stdout, "Average SE_K2M: %f\n", (totsedist/ (double)(totalalignments)));
 
-  
-  fprintf(outfasta, "\n\n-------------DISTANCE MATRIX------------\n\n");
-
-  
-  for (j=0; j<horcnt; j++)
-    fprintf(outfasta, "%s\t", hornames[j]);
-
-  fprintf(outfasta, "\n");
-
-  for (i=0; i<monocnt; i++){
-    fprintf(outfasta, "%s\t\t", names[i]);
-    for (j=0; j<horcnt; j++){
-      fprintf(outfasta, "%f\t", distances[i][j]);
-    }
-    fprintf(outfasta, "\n");
-  }
-  
-  
 
   fprintf(outfasta, "\n");
   fprintf(outfasta, "Average K2M: %f\n", (totdist/ (double)(totalalignments)));
   fprintf(outfasta, "Average SE_K2M: %f\n", (totsedist/ (double)(totalalignments)));
-      
+
+  
+  /*
+  
+  if(!strcmp(argv[1],argv[2])){
+    for (i=0;i<horcnt-2;i++){
+      score = pairwise(seqs[i], seqs[i+2]);
+      kimura(aligned[0], aligned[1], &distance, &se_distance);
+      if (distance>0.2){
+	fprintf(outfasta, "NOTDIMERIC\n");
+      }
+    }
+  }
+  */
   
   return 1;
 } 
@@ -840,4 +905,30 @@ void kimura(char *s1, char *s2, double *dist, double *se_dist){
   *dist = k_kimura;
   *se_dist = SE_k_kimura;
   
+}
+
+
+void rcomp(char *window, char *rcomp){
+  /* reverse complement */
+  int i;
+  int len = strlen(window);
+  for (i=0;i<len;i++)
+    switch (toupper(window[i])){
+    case 'A':
+      rcomp[len-i-1] = 'T';
+      break;
+    case 'C':
+      rcomp[len-i-1] = 'G';
+      break;
+    case 'G':
+      rcomp[len-i-1] = 'C';
+      break;
+    case 'T':
+      rcomp[len-i-1] = 'A';
+      break;
+    default:
+      rcomp[len-i-1] = window[i];
+      break;
+    }
+  rcomp[len] = 0;
 }
