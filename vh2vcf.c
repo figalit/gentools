@@ -39,7 +39,7 @@ int id = 1;
 
 
 
-void do_chrom(char *thischrom, int i, int minsup, int maxsup, int mininvsup, float maxdup, float prune);
+void do_chrom(char *thischrom, int i, int minsup, int maxsup, int mininvsup, float maxdup, float prune, int withchr);
 
 int total_del_bp=0;
 int total_ins_bp=0;
@@ -101,6 +101,7 @@ int main(int argc, char **argv){
 
   int male = 1;
   int mininvsup=-1;
+  int withchr = 0;
 
   time ( &rawtime );
   timeinfo = localtime ( &rawtime );
@@ -130,6 +131,7 @@ int main(int argc, char **argv){
     else if (!strcmp(argv[i], "-s")) strcpy(samplename, argv[i+1]);
     else if (!strcmp(argv[i], "-h")) {printHelp(argv[0]); return 0;}
     else if (!strcmp(argv[i], "-noram")) ram_for_del = 0;
+    else if (!strcmp(argv[i], "-chr")) withchr = 1;
   }
 
   if (mininvsup == -1)
@@ -184,18 +186,29 @@ int main(int argc, char **argv){
   
   for (i=1; i<=22; i++){
 
-    sprintf(thischrom, "chr%d", i);
-    do_chrom(thischrom, i, minsup, maxsup, mininvsup, maxdup, prune);
+    if (withchr)
+      sprintf(thischrom, "chr%d", i);
+    else
+      sprintf(thischrom, "%d", i);
+    do_chrom(thischrom, i, minsup, maxsup, mininvsup, maxdup, prune, withchr);
   }
 
   i=23;
-  sprintf(thischrom, "chrX", i);
-  do_chrom(thischrom, i, minsup, maxsup, mininvsup, maxdup, prune);
+  if (withchr)
+    sprintf(thischrom, "chrX");
+  else
+    sprintf(thischrom, "X");
+
+  do_chrom(thischrom, i, minsup, maxsup, mininvsup, maxdup, prune, withchr);
 
   if (male){
     i=24;
-    sprintf(thischrom, "chrY", i);
-    do_chrom(thischrom, i, minsup, maxsup, mininvsup, maxdup, prune);
+    if (withchr)
+      sprintf(thischrom, "chrY");
+    else
+      sprintf(thischrom, "Y");
+
+    do_chrom(thischrom, i, minsup, maxsup, mininvsup, maxdup, prune, withchr);
   }
 
   fprintf(stdout, "Sample = %s\n", samplename);
@@ -235,7 +248,7 @@ float calc_rep(int s, int e){
 }
 
 
-void do_chrom(char *thischrom, int i, int minsup, int maxsup, int mininvsup, float maxdup, float prune){
+void do_chrom(char *thischrom, int i, int minsup, int maxsup, int mininvsup, float maxdup, float prune, int withchr){
 
   int j;
   int s, e;
@@ -362,7 +375,10 @@ void do_chrom(char *thischrom, int i, int minsup, int maxsup, int mininvsup, flo
       if( (ie-is+1) < 0) continue;
 
       /* note: the 'N' below should change to the actual basepair in the reference. See the TODO list at the top of this code */
-      fprintf(out, "%s\t%d\t%s_%d\t%c\t%s\t.\t.\t", thischrom+strlen("chr"), is, samplename, id++, 'N', _svtype);
+      if (withchr)
+	fprintf(out, "%s\t%d\t%s_%d\t%c\t%s\t.\t.\t", thischrom+strlen("chr"), is, samplename, id++, 'N', _svtype);
+      else
+	fprintf(out, "%s\t%d\t%s_%d\t%c\t%s\t.\t.\t", thischrom, is, samplename, id++, 'N', _svtype);
 
       fprintf(out, "CIEND=%d,%d;", 0, (oe-ie));
       fprintf(out, "CIPOS=%d,%d;", (os-is), 0);
