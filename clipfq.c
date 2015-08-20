@@ -1,5 +1,6 @@
 #include <stdio.h>
-#define MAX 200
+#include <string.h>
+#define MAX 500
 
 int main(int argc, char **argv){
   int clip=0;
@@ -18,9 +19,28 @@ int main(int argc, char **argv){
   }
 
   fp=fopen(fname, "r");
+  if (fp==NULL){
+    fprintf(stderr, "File %s cannot be opened.\n", fname);
+    return 0;
+  }
+  if (clip <= 0){
+    fprintf(stderr, "Use a non-zero positive integer for clip. You entered %d.\n", clip);
+    return 0;
+  }
 
-  while(fscanf(fp, "%s\n%s\n%s\n%s\n", name, seq, plus,qual)>0){
-    fprintf(stdout, "%s\n%s\n%s\n%s\n", name, seq+clip, plus,qual+clip);
+  while(1){
+    if (feof(fp)) break;
+    fgets(name, MAX, fp);
+    if (feof(fp)) break;
+    fgets(seq, MAX, fp);
+    fgets(plus, MAX, fp);
+    fgets(qual, MAX, fp);
+    seq[strlen(seq)-1]=0;
+    qual[strlen(qual)-1]=0;
+
+    seq[clip]=0; qual[clip]=0;
+
+    fprintf(stdout, "%s%s\n%s%s\n", name, seq, plus,qual);
   }
   
   return 1;

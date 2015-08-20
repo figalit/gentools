@@ -25,7 +25,7 @@ static int maxfunc(const void *p1, const void *p2);
 int count_colon(char *name);
 
 int main(int argc, char **argv){
-  FILE *fp;
+  FILE *fp; gzFile *gfp;
   int i,j;
   char fname[100];
   int nseq;
@@ -38,6 +38,7 @@ int main(int argc, char **argv){
   char line[1000];
   FILE *clean;
   FILE *dup;
+  gzFile gzclean, gzdup;
   char fname2[100];
   int crop=0;
   char *ch;
@@ -64,7 +65,7 @@ int main(int argc, char **argv){
   if (fname[0]==0) return 0;
   
   if (GZ)
-    fp = gzopen(fname, "r");
+    gfp = gzopen(fname, "r");
   else
     fp = fopen(fname, "r");
   
@@ -78,9 +79,9 @@ int main(int argc, char **argv){
   
   if (GZ){
     sprintf(fname2, "%s.clean.gz", fname);
-    clean = gzopen(fname2, "w");
+    gzclean = gzopen(fname2, "w");
     sprintf(fname2, "%s.dup.gz", fname);
-    dup = gzopen(fname2, "w");
+    gzdup = gzopen(fname2, "w");
   }
   else{
     sprintf(fname2, "%s.clean.fq", fname);
@@ -102,32 +103,32 @@ int main(int argc, char **argv){
   
   if (GZ){
     while (!gzeof (fp)){
-      gzgets(fp, line, 1000);
-      if (gzeof (fp)) break;
+      gzgets(gfp, line, 1000);
+      if (gzeof (gfp)) break;
       line[strlen(line)-3] = 0;
       strcpy(name, line); // name/1
       
-      gzgets(fp, line, 1000);
+      gzgets(gfp, line, 1000);
       line[strlen(line)-1] = 0;
       strcpy(sequence, line); // sequence1
       
-      gzgets(fp, line, 1000); // + line
+      gzgets(gfp, line, 1000); // + line
       
       
-      gzgets(fp, line, 1000);
+      gzgets(gfp, line, 1000);
       line[strlen(line)-1] = 0;
       strcpy(fqual, line); // qual1
       
-      gzgets(fp, line, 1000); // name/2
+      gzgets(gfp, line, 1000); // name/2
       
       
-      gzgets(fp, line, 1000);
+      gzgets(gfp, line, 1000);
       line[strlen(line)-1] = 0;
       strcpy(revseq, line); // sequence2
       
-      gzgets(fp, line, 1000);// + line
+      gzgets(gfp, line, 1000);// + line
       
-      gzgets(fp, line, 1000);
+      gzgets(gfp, line, 1000);
       line[strlen(line)-1] = 0;
       strcpy(rqual, line); // qual2
       
@@ -153,7 +154,7 @@ int main(int argc, char **argv){
       i++;
     }
     
-    gzclose(fp);
+    gzclose(gfp);
   }
   
   else{
@@ -297,7 +298,7 @@ int main(int argc, char **argv){
     
 
     if (GZ)
-      gzprintf(clean, "%s/1\n%s\n+\n%s\n%s/2\n%s\n+\n%s\n", seqs[i]->name, sequence, fqual, seqs[i]->name, revseq, rqual);
+      gzprintf(gzclean, "%s/1\n%s\n+\n%s\n%s/2\n%s\n+\n%s\n", seqs[i]->name, sequence, fqual, seqs[i]->name, revseq, rqual);
     else
       fprintf(clean, "%s/1\n%s\n+\n%s\n%s/2\n%s\n+\n%s\n", seqs[i]->name, sequence, fqual, seqs[i]->name, revseq, rqual);
     
@@ -352,7 +353,7 @@ int main(int argc, char **argv){
 
 fprintf(stderr, "  done.\n");
   if (GZ){
-  gzclose(dup); gzclose(clean);
+  gzclose(gzdup); gzclose(gzclean);
   }
   else{
   fclose(dup); fclose(clean);
