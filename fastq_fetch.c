@@ -78,7 +78,6 @@ void  fastq_fetch(char *filename1, char *filename2){
   }  
   fclose(f2);
 
-  for (i=0; i<10; i++) printf("%s\n", names[i]);
 
   f1 = fopen(filename1, "r");
  
@@ -88,9 +87,6 @@ void  fastq_fetch(char *filename1, char *filename2){
   }
 
   qsort(names, num_seq, sizeof(char *), qname_comp); 
-
-  fprintf(stderr, "-------------\n");
-  for (i=0; i<10; i++) printf("%s\n", names[i]);
 
   ofilename1 = (char *) malloc (sizeof(char) * (strlen(filename1)+strlen(filename2)+10));
   
