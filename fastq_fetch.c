@@ -23,7 +23,11 @@ int main(int argc, char **argv){
 
   char name[2048];
 
-  if (argc != 3) return;
+  if (argc != 3){
+    fprintf(stderr, "FASTQ read fetcher.\n\n");
+    fprintf(stderr, "Usage: %s [FASTQ file] [List of read names].\n\n", argv[0]);
+    return;
+  }
 
   fastq_fetch(argv[1], argv[2]);
 
