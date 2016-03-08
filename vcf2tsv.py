@@ -57,7 +57,7 @@ with open(filename, 'r') as infile, open(filename[:-4] + '_output.tsv', 'w') as 
         typ = 'SNV' if len(first5[3]) == len(first5[4]) else 'INDEL'
 
         if typ == 'SNV' and len(first5[3]) > 1 and len(first5[3]) == len(first5[4]):
-            typ = 'CONF'
+            typ = 'MULT'
 
         classification = map(classify, row[-4:])
 
