@@ -68,16 +68,17 @@ int main(int argc, char **argv){
     scanf("%s\n", seq);
     fgets(plus, 500, stdin);
     scanf("%s\n", qual);
-    if (rmshit){
-      if (scanf("%s", name2) <= 0) break;
-      fgets(dummy, 500, stdin);
-      scanf("%s\n", seq2);
-      fgets(plus2, 500, stdin);
-      scanf("%s\n", qual2);
+    //if (rmshit){
 
-      shit = isShit(seq, qual, seq2, qual2);
-      
-    }
+    if (scanf("%s", name2) <= 0) break;
+    fgets(dummy, 500, stdin);
+    scanf("%s\n", seq2);
+    fgets(plus2, 500, stdin);
+    scanf("%s\n", qual2);
+    
+    shit = isShit(seq, qual, seq2, qual2);
+    
+    //}
     
     if (allq!=0){
       shit = isAllQShit(seq, qual, allq);
@@ -87,7 +88,7 @@ int main(int argc, char **argv){
       shit = isSingleShit(seq, qual);
     }
 
-    if (shit) {shitcnt++; continue;}
+    if (rmshit && shit) {shitcnt++; continue;}
     
 
     //  while(scanf("%s\n%s\n%s\n%s\n", name, seq, plus, qual) > 0){
@@ -127,14 +128,14 @@ int main(int argc, char **argv){
       else
 	fprintf(out, ">%s\n%s\n", (name+1), seq);
       i++; numreads++;
-      if (rmshit){
+      //if (rmshit){
 	if (!fasta)
 	  fprintf(out, "%s\n%s\n+\n%s\n", name2, seq2, qual2);
 	else
 	  fprintf(out, ">%s\n%s\n", (name2+1), seq2);
 	i++;
 	numreads++;
-      }
+	//}
     }
 
   }
