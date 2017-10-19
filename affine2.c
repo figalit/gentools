@@ -96,12 +96,12 @@ main(int argc, char **argv){
   P[0][0] = 0;
   for (i=1;i<=sSize;i++){
     V[i][0] = -Wg - i*Ws;
-    E[i][0] = -10000; /* -infinity */
+    E[i][0] = -Wg - i*Ws; 
     P[i][0] = 1;
   }
   for (j=1;j<=tSize;j++){
     V[0][j] = -Wg - j*Ws;
-    F[0][j] = -10000; /* -infinity */
+    F[0][j] = -Wg - j*Ws; 
     P[0][j] = 0;
   }
   for (i=1;i<=sSize;i++)
