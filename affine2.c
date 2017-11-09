@@ -18,6 +18,9 @@ void align(char *, char *, int **, int **);
 void output(char *, char *);
 char **seqs;
 char **names;
+void print_dp_table(int **T, int n, int m);
+long long memUsage=0;
+void* getMem( size_t size);
 
 //int readSingleFasta(FILE *);
 
@@ -61,18 +64,20 @@ main(int argc, char **argv){
 
   printf("Source Size = %d, Text Size = %d\n",sSize,tSize);
   /* create vectors */
-  V = (int **)malloc(sizeof(int)*(sSize+1));
-  F = (int **)malloc(sizeof(int)*(sSize+1));
-  E = (int **)malloc(sizeof(int)*(sSize+1));
-  G = (int **)malloc(sizeof(int)*(sSize+1));
-  P = (int **)malloc(sizeof(int)*(sSize+1));
+  V = (int **)getMem(sizeof(int *)*(sSize+1));
+  F = (int **)getMem(sizeof(int *)*(sSize+1));
+  E = (int **)getMem(sizeof(int *)*(sSize+1));
+  G = (int **)getMem(sizeof(int *)*(sSize+1));
+  P = (int **)getMem(sizeof(int *)*(sSize+1));
+
   for (i=0;i<=sSize;i++){
-    V[i]=(int *)malloc(sizeof(int)*(tSize+1));    
-    F[i]=(int *)malloc(sizeof(int)*(tSize+1));
-    E[i]=(int *)malloc(sizeof(int)*(tSize+1));
-    G[i]=(int *)malloc(sizeof(int)*(tSize+1));
-    P[i]=(int *)malloc(sizeof(int)*(tSize+1));
+    V[i]=(int *)getMem(sizeof(int)*(tSize+1));
+    F[i]=(int *)getMem(sizeof(int)*(tSize+1));
+    E[i]=(int *)getMem(sizeof(int)*(tSize+1));
+    G[i]=(int *)getMem(sizeof(int)*(tSize+1));
+    P[i]=(int *)getMem(sizeof(int)*(tSize+1));
   } // for
+  
   /* get Wg and Ws 
   printf("Wg? ");
   scanf("%d",&Wg),
@@ -91,12 +96,12 @@ main(int argc, char **argv){
   P[0][0] = 0;
   for (i=1;i<=sSize;i++){
     V[i][0] = -Wg - i*Ws;
-    E[i][0] = -10000; /* -infinity */
+    E[i][0] = -Wg - i*Ws; 
     P[i][0] = 1;
   }
   for (j=1;j<=tSize;j++){
     V[0][j] = -Wg - j*Ws;
-    F[0][j] = -10000; /* -infinity */
+    F[0][j] = -Wg - j*Ws; 
     P[0][j] = 0;
   }
   for (i=1;i<=sSize;i++)
@@ -112,6 +117,18 @@ main(int argc, char **argv){
       else
 	P[i][j] = 1; // match seqs[0][i]-"-"
     }
+
+
+  printf("V:\n\n");
+  print_dp_table(V, sSize, tSize);
+  printf("G:\n\n");
+  print_dp_table(G, sSize, tSize);
+  printf("E:\n\n");
+  print_dp_table(E, sSize, tSize);
+  printf("F:\n\n");
+  print_dp_table(F, sSize, tSize);
+  printf("P:\n\n");
+  print_dp_table(P, sSize, tSize);
 
   printf("The value of optimal alignment is: %d\n", V[sSize][tSize]);
   //printf("Want to see one alignment scheme? [y/n] ");
@@ -155,12 +172,12 @@ void align(char *S, char *T, int **V, int **P){
   int i,j,k; int c2=0;
   char *Sp, *Tp; // Sprime, Tprime
   char *Sp2, *Tp2; // Sprime, Tprime
-  Tp = (char *)malloc(tSize*2);
-  Sp = (char *)malloc(sSize*2);
+  Tp = (char *)getMem(tSize*2);
+  Sp = (char *)getMem(sSize*2);
   Tp[0]=0;
   Sp[0]=0;
-  Tp2 = (char *)malloc(tSize*2);
-  Sp2 = (char *)malloc(sSize*2);
+  Tp2 = (char *)getMem(tSize*2);
+  Sp2 = (char *)getMem(sSize*2);
   Tp2[0]=0;
   Sp2[0]=0;
   i = sSize; j = tSize;
@@ -285,16 +302,16 @@ int readSingleFasta(FILE *fastaFile){
   fprintf(stderr, "Allocating memory for %d sequences with max length %d.\n", seqcnt, maxlen);
   
   
-  seqs = (char **) malloc((seqcnt) * sizeof(char *));
+  seqs = (char **) getMem((seqcnt) * sizeof(char *));
   
   for (i=0; i<seqcnt; i++)
-    seqs[i] = (char *) malloc(maxlen);
+    seqs[i] = (char *) getMem(maxlen);
   
 
-  names = (char **) malloc((seqcnt) * sizeof(char *));
+  names = (char **) getMem((seqcnt) * sizeof(char *));
 
   for (i=0; i<seqcnt; i++)
-    names[i] = (char *) malloc(SEQ_LENGTH);
+    names[i] = (char *) getMem(SEQ_LENGTH);
   
   
   
@@ -346,3 +363,33 @@ int readSingleFasta(FILE *fastaFile){
 
 }
 */
+
+
+void print_dp_table(int **T, int n, int m){
+  int i,j;
+
+  for (i=0; i<=n; i++){
+    for (j=0; j<=m; j++){
+      fprintf (stdout, "%d\t", T[i][j]);
+    }
+    fprintf (stdout, "\n");
+  }
+
+    fprintf (stdout, "\n\n");
+
+}
+
+void* getMem( size_t size)
+{
+	void* ret;
+
+	ret = malloc( size);
+	if( ret == NULL)
+	{
+		fprintf( stderr, "Cannot allocate memory. Currently addressed memory = %0.2f MB, requested memory = %0.2f MB.\nCheck the available main memory.\n", memUsage/1048576.0, ( float) ( size / 1048576.0));
+		exit( 0);
+	}
+
+	memUsage = memUsage + size;
+	return ret;
+}
