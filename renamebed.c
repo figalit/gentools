@@ -35,8 +35,8 @@ int main(int argc, char **argv){
       {"input"  , required_argument,   0, 'i'},
       {"out"    , required_argument, 0, 'o'},
       {"conversion"    , required_argument, 0, 'c'},
-      {"forward", no_argument,     &ucsctogrc    , 'f'},
-      {"reverse", no_argument, &grctoucsc, 'r'},
+      {"forward", no_argument,    0, 'f'},
+      {"reverse", no_argument, 0, 'r'},
       {"help"   , no_argument,         0, 'h'},
       {0        , 0,                   0,  0 }
     };
@@ -56,6 +56,14 @@ int main(int argc, char **argv){
       break;
     case 'c':
       strcpy(conversionFileName, optarg);
+      break;
+    case 'r':
+      grctoucsc = 1;
+      ucsctogrc = 0;
+      break;
+    case 'f':
+      grctoucsc = 0;
+      ucsctogrc = 1;
       break;
     case 'h':
       print_help(argv[0]);

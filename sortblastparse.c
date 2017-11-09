@@ -74,7 +74,9 @@ int main(int argc, char **argv){
     }
   }
 
-  printf("%s", header);
+  if (isHeader)
+    printf("%s", header);
+
   for (i=0;i<numhit;i++){
     rewind(fp);
     fgets(line, 1000, fp); // pass header

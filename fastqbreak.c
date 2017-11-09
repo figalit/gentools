@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <zlib.h>
+
 #define QCUT 20
 
 int isShit(char [], char [], char [], char []);
@@ -10,6 +12,7 @@ int shitshown=0;
 
 int main(int argc, char **argv){
   FILE *out;
+  gzFile gzout;
   char fname[5000];
   char outdir[5000];
   long i,j;
@@ -31,6 +34,7 @@ int main(int argc, char **argv){
   int crop=0;
   int sangerize = 0;
   int shitcnt=0;
+  int gz=0;
 
   int len1, len2;
   int numreads =  0;
@@ -57,6 +61,8 @@ int main(int argc, char **argv){
     else if (!strcmp(argv[i], "-sq")){
       sangerize = 1;
     }
+    else if (!strcmp(argv[i], "-gz"))
+      gz = 1;
   }
   
   fprintf(stderr, "q=%d\n", QUAL_OFFSET);
@@ -93,9 +99,20 @@ int main(int argc, char **argv){
 
     //  while(scanf("%s\n%s\n%s\n%s\n", name, seq, plus, qual) > 0){
     if (i%batch == 0){
-      if (i!=0) fclose(out);
-      sprintf(fname, "%s%ld", outdir, i);
-      out = fopen(fname, "w"); 
+      if (i!=0) {
+	if (gz)
+	  gzclose(gzout);
+	else
+	  fclose(out);
+      }
+      if (gz)
+	sprintf(fname, "%s%ld.gz", outdir, i);
+      else
+	sprintf(fname, "%s%ld", outdir, i);
+      if (gz)
+	gzout = gzopen(fname, "w");
+      else
+	out = fopen(fname, "w"); 
       fprintf(stderr, "%s\n", fname);
     }
 
@@ -123,19 +140,35 @@ int main(int argc, char **argv){
       if (crop!=0 && strlen(seq)<crop)
 	continue;
     
-      if (!fasta)
-	fprintf(out, "%s\n%s\n+\n%s\n", name, seq, qual);
-      else
-	fprintf(out, ">%s\n%s\n", (name+1), seq);
+      if (!fasta){
+	if (gz)
+	  gzprintf(gzout, "%s\n%s\n+\n%s\n", name, seq, qual);
+	else
+	  fprintf(out, "%s\n%s\n+\n%s\n", name, seq, qual);	  
+      }
+      else{
+	if (gz)
+	  gzprintf(gzout, ">%s\n%s\n", (name+1), seq);
+	else
+	  fprintf(out, ">%s\n%s\n", (name+1), seq);
+      }
       i++; numreads++;
       //if (rmshit){
-	if (!fasta)
+      if (!fasta){
+	if (gz)
+	  gzprintf(gzout, "%s\n%s\n+\n%s\n", name2, seq2, qual2);
+	else
 	  fprintf(out, "%s\n%s\n+\n%s\n", name2, seq2, qual2);
+      }
+      else{
+	if (gz)
+	  gzprintf(gzout, ">%s\n%s\n", (name2+1), seq2);
 	else
 	  fprintf(out, ">%s\n%s\n", (name2+1), seq2);
-	i++;
-	numreads++;
-	//}
+      }
+      i++;
+      numreads++;
+      //}
     }
 
   }

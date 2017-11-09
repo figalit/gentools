@@ -456,7 +456,7 @@ int readFasta(FILE *alnFile, FILE *horFile){
   int j;
 
   cnt = 0; i=0;
-  seqlen = 2000; horseqlen = 2000;
+  seqlen = 2000000; horseqlen = 2000000;
   
   rewind(alnFile);
   while (fscanf(alnFile, "%c", &ch) > 0){
@@ -559,12 +559,14 @@ int readFasta(FILE *alnFile, FILE *horFile){
     else if (isspace(ch))
       continue;
 
+    ch = toupper(ch);
     i = 0;
     if (cnt != 0)
       seqs[cnt][i++] = ch;
     do{
       if (!(fscanf(alnFile, "%c", &ch) > 0))
 	break;
+      ch = toupper(ch);
       if (ch!='>' && ch!='\r' && ch!='\n')
 	seqs[cnt][i++] = ch;
     } while (ch != '>');
@@ -610,12 +612,14 @@ int readFasta(FILE *alnFile, FILE *horFile){
     }
     else if (isspace(ch))
       continue;
+    ch = toupper(ch);
     i = 0;
     if (cnt != 0)
       horseqs[cnt][i++] = ch;
     do{
       if (!(fscanf(horFile, "%c", &ch) > 0))
 	break;
+      ch = toupper(ch);
       if (ch!='>' && ch!='\r' && ch!='\n')
 	horseqs[cnt][i++] = ch;
     } while (ch != '>');
@@ -686,7 +690,7 @@ int main(int argc, char **argv){
     //aligned[i]=(char *)malloc(strlen(seqs[i]) * 3);
     aligned[i]=(char *)malloc(2000 * 5);
 
-  revseq=(char *)malloc(2000 * 5);
+  revseq=(char *)malloc(2000000 * 5);
 
   noofsequences=monocnt;
 

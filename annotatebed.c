@@ -65,7 +65,7 @@ int main(int argc, char **argv){
     printf("\t-a [annotation files]:\tList of BED files that will be used for annotation.\t\t\t<mandatory>\n");
     printf("\t-o [output file]:\tOutput file.\t\t\t\t\t\t\t\t<mandatory>\n");
     printf("\t-g [gene file]:\t\tGene table as a BED4 file.\t\t\t\t\t\t<optional>\n");
-    printf("\t-chr :\t\tPrefix chr to chromosome names.\t\t\t\t\t\t<optional>\n");
+    printf("\t-c :\t\tPrefix chr to chromosome names.\t\t\t\t\t\t<optional>\n");
     printf("\nAll options except -g are mandatory!\nAnnotation files (-a) should be BED3, gene table should be BED4.\nAll tab-delimited text files.\n");
     printf("\nExample:\n\t%s -i microhotspots.bed -a wgac.bed wssd.bed repeatmasker.bed -o microhotspots.annotated_output.bed\n", argv[0]);
     printf("\n\nThis version supports only chr1-chr22-chrX-chrY. _random chromosomes, and chromosome names for other species (chr2a, chr2b, etc.) will be added later.\n");
@@ -89,8 +89,9 @@ int main(int argc, char **argv){
       strcpy(outfile, argv[++i]);
     else if (!strcmp(argv[i], "-g"))
       strcpy(genefname, argv[++i]);
-    else if (!strcmp(argv[i], "-chr"))
-      withchr=1;
+    else if (!strcmp(argv[i], "-c")){
+      withchr=1; i++;
+    }
     else i++;
   }
 
@@ -189,6 +190,7 @@ int main(int argc, char **argv){
 
   fprintf(dump, "\n");
 
+  fprintf(stderr, "Withchr: %d\n", withchr);
 
   for (i=1;i<=22;i++){
 
@@ -216,9 +218,11 @@ int main(int argc, char **argv){
   if (withchr)
     sprintf(thischr, "chrY");
   else
-    sprintf(thischr, "chrY");
+    sprintf(thischr, "Y");
   rewind(border);  
+
   for (j=0;j<fileCount;j++)  rewind(fp[j]); 
+  
   dochr(thischr, border, fp, fileStart, fileEnd);
 
 
@@ -261,6 +265,8 @@ void dochr(char *thischr, FILE *border, FILE **fp, int fileStart, int fileEnd){
     marker = 1;
     marker = marker << j;
     while (fscanf(fp[j], "%s\t%d\t%d\n", chr, &s, &e) > 0){
+      //printf("chr %s this %s\n", chr, thischr);
+	
       if (strcmp(chr, thischr)) continue;
       for (i=s; i<e; i++) {
 	seq[i] = seq[i] | marker;
@@ -284,7 +290,7 @@ void dochr(char *thischr, FILE *border, FILE **fp, int fileStart, int fileEnd){
   
   fprintf(stderr, "Annotation tables are loaded, reading pivot file\n");
 
-  while (fscanf(border, "%s%d%d", chr, &s, &e) > 0){
+  while (fscanf(border, "%s\t%d\t%d", chr, &s, &e) > 0){
     fgets(rest, 10000, border);
     rest[strlen(rest)-1] = 0;
     if (strcmp(chr, thischr)) continue;
